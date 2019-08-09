@@ -5,12 +5,10 @@ module Main where
 
 import qualified Data.ByteString.Lazy.Char8 as B
 
-import           Data.Morpheus              (interpreter)
-import           Data.Morpheus.Types        (GQLRootResolver (..), ResM, gqlResolver)
+import Data.Morpheus (interpreter)
+import Data.Morpheus.Types (GQLRootResolver (..), ResM, gqlResolver)
 import GHC.Generics ( Generic )
-import Files.Files                    ( allDBEntry
-                                                , lookupDBEntry
-                                                )
+import Files.Files ( allDBEntry, lookupDBEntry)
 import Web.Scotty
 import Control.Monad.IO.Class (liftIO)
 import Flow
@@ -32,10 +30,12 @@ resolveDeity args =
 
 
 resolveDeities :: () -> ResM [Deity]
-resolveDeities _ = gqlResolver $ allDBEntry
+resolveDeities _ =
+	gqlResolver allDBEntry
 
 resolveQuery :: Query
-resolveQuery = Query { deity = resolveDeity, deities = resolveDeities }
+resolveQuery =
+	Query { deity = resolveDeity, deities = resolveDeities }
 
 rootResolver :: GQLRootResolver IO Query () ()
 rootResolver = GQLRootResolver
@@ -49,5 +49,5 @@ gqlApi =
 	interpreter rootResolver
 
 main :: IO ()
-main = 
+main =
 	scotty 3000 $ post "/api" $ raw =<< (liftIO . gqlApi =<< body)
