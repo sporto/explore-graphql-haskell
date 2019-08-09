@@ -9,15 +9,16 @@ import Data.Morpheus.Types ( GQLType(..), ResM, gqlResolver)
 import Data.Text ( Text )
 import GHC.Generics ( Generic )
 import Lib
+import           Data.Aeson                     ( FromJSON )
 
-data Query = Query
-  { deity :: DeityArgs -> ResM Deity
-  } deriving (Generic)
+-- data Query = Query
+--   { deity :: DeityArgs -> ResM Deity
+--   } deriving (Generic)
 
 data Deity = Deity
   { fullName :: Text         -- Non-Nullable Field
   , power    :: Maybe Text   -- Nullable Field
-  } deriving (Generic, GQLType)
+  } deriving (Generic, GQLType, FromJSON)
 
 type instance KIND Deity = OBJECT
 
