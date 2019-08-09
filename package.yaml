@@ -27,6 +27,7 @@ dependencies:
 - aeson
 - containers
 - scotty
+- flow
 
 library:
   source-dirs: src

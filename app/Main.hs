@@ -13,6 +13,7 @@ import Files.Files                    ( allDBEntry
                                                 )
 import Web.Scotty
 import Control.Monad.IO.Class (liftIO)
+import Flow
 
 import Lib
 import Schema (Deity, DeityArgs, name)
@@ -25,7 +26,9 @@ data Query = Query
 
 resolveDeity :: DeityArgs -> ResM Deity
 resolveDeity args =
-	gqlResolver $ lookupDBEntry (name args)
+	name args
+		|> lookupDBEntry
+		|> gqlResolver
 
 
 resolveDeities :: () -> ResM [Deity]
