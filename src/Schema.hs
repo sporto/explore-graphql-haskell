@@ -4,8 +4,8 @@
 
 module Schema where
 
-import Data.Morpheus.Kind ( KIND, OBJECT)
-import Data.Morpheus.Types ( GQLType(..), ResM, gqlResolver)
+import Data.Morpheus.Kind (OBJECT)
+import Data.Morpheus.Types ( GQLType(..) )
 import Data.Text ( Text )
 import GHC.Generics ( Generic )
 import Lib
@@ -18,9 +18,10 @@ import           Data.Aeson                     ( FromJSON )
 data Deity = Deity
   { fullName :: Text         -- Non-Nullable Field
   , power    :: Maybe Text   -- Nullable Field
-  } deriving (Generic, GQLType, FromJSON)
+  } deriving (Generic, FromJSON)
 
-type instance KIND Deity = OBJECT
+instance GQLType Deity where
+	type KIND Deity = OBJECT
 
 data DeityArgs = DeityArgs
   { name      :: Text        -- Required Argument

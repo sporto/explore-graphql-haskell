@@ -41,7 +41,7 @@ packages:
 #
 extra-deps:
   - megaparsec-7.0.5
-  - morpheus-graphql-0.1.1
+  - morpheus-graphql-0.7.0
 
 # Override default flag values for local packages and extra-deps
 # flags: {}

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE OverloadedStrings #-}
 
@@ -6,7 +7,7 @@ module Main where
 import qualified Data.ByteString.Lazy.Char8 as B
 
 import Data.Morpheus (interpreter)
-import Data.Morpheus.Types (GQLRootResolver (..), ResM, gqlResolver)
+import Data.Morpheus.Types (GQLRootResolver (..), GQLType, IORes, Undefined(..), liftEither  )
 import GHC.Generics ( Generic )
 import Files.Files ( allDBEntry, lookupDBEntry)
 import Web.Scotty
@@ -16,32 +17,32 @@ import Flow
 import Lib
 import Schema (Deity, DeityArgs, name)
 
-data Query = Query
-  { deity :: DeityArgs -> ResM Deity,
-    deities :: ()     -> ResM [Deity]
-  } deriving (Generic)
+data Query m = Query
+  { deity :: DeityArgs -> m Deity,
+    deities :: ()     -> m [Deity]
+  } deriving (Generic, GQLType)
 
 
-resolveDeity :: DeityArgs -> ResM Deity
+resolveDeity :: DeityArgs -> IORes e Deity
 resolveDeity args =
 	name args
 		|> lookupDBEntry
-		|> gqlResolver
+		|> liftEither
 
 
-resolveDeities :: () -> ResM [Deity]
+resolveDeities :: () -> IORes e [Deity]
 resolveDeities _ =
-	gqlResolver allDBEntry
+	liftEither allDBEntry
 
-resolveQuery :: Query
+resolveQuery :: Query m
 resolveQuery =
 	Query { deity = resolveDeity, deities = resolveDeities }
 
-rootResolver :: GQLRootResolver IO Query () ()
+rootResolver :: GQLRootResolver IO () Query Undefined Undefined
 rootResolver = GQLRootResolver
-    { queryResolver        = return resolveQuery
-    , mutationResolver     = return ()
-    , subscriptionResolver = return ()
+    { queryResolver        = resolveQuery
+    , mutationResolver     = Undefined
+    , subscriptionResolver = Undefined
     }
 
 gqlApi :: B.ByteString -> IO B.ByteString
